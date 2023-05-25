@@ -1,0 +1,11 @@
+{
+    "funderA": {
+      "full_name": "profile.name",
+      "fcr": "credit_score.fcr"
+    },
+    "funderB": {
+      "borrower.name": "profile.name",
+      "borrower.fcr": "credit_score.fcr"
+    }
+  }
+  
