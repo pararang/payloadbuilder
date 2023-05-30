@@ -7,7 +7,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/mitchellh/mapstructure"
+	// _ "github.com/mitchellh/mapstructure"
 )
 
 type FunderAPayload struct {
@@ -24,7 +24,7 @@ type BorrowerData struct {
 	FCR  int    `json:"fcr"`
 }
 
-type configJSON map[string]interface{}
+type configJSON map[string]string
 
 type MappingConfig struct {
 	FunderA configJSON `json:"funderA"`
@@ -46,7 +46,19 @@ func loadMappingConfig(filePath string) (MappingConfig, error) {
 	return config, nil
 }
 
-func mapDataToFunderPayload(data map[string]interface{}, funder string) (interface{}, error) {
+func iterateFields(data map[string]interface{}, prefix string) {
+	for key, value := range data {
+		if nestedMap, ok := value.(map[string]interface{}); ok {
+			// Recursively iterate over nested maps
+			iterateFields(nestedMap, prefix+key+".")
+		} else {
+			// Handle leaf nodes (non-object values)
+			fmt.Printf("Field: %s%s, Value: %v\n", prefix, key, value)
+		}
+	}
+}
+
+func mapDataToFunderPayload(data map[string]interface{}, funder string) (map[string]interface{}, error) {
 	config, err := loadMappingConfig("mapping_config.json")
 	if err != nil {
 		return nil, err
@@ -69,21 +81,25 @@ func mapDataToFunderPayload(data map[string]interface{}, funder string) (interfa
 			log.Println("failed get value for ", key)
 			continue
 		}
+
+		
 		payload[key] = val
 	}
 
-	switch funder {
-	case "funderA":
-		funderAPayload := FunderAPayload{}
-		err = mapstructure.Decode(payload, &funderAPayload)
-		return funderAPayload, err
-	case "funderB":
-		funderBPayload := FunderBPayload{}
-		err = mapstructure.Decode(payload, &funderBPayload)
-		return funderBPayload, err
-	default:
-		return nil, fmt.Errorf("unsupported funder: %s", funder)
-	}
+	return payload, nil
+
+	// switch funder {
+	// case "funderA":
+	// 	funderAPayload := FunderAPayload{}
+	// 	err = mapstructure.Decode(payload, &funderAPayload)
+	// 	return funderAPayload, err
+	// case "funderB":
+	// 	funderBPayload := FunderBPayload{}
+	// 	err = mapstructure.Decode(payload, &funderBPayload)
+	// 	return funderBPayload, err
+	// default:
+	// 	return nil, fmt.Errorf("unsupported funder: %s", funder)
+	// }
 }
 
 func getNestedValue(data map[string]interface{}, key string) (interface{}, error) {
@@ -113,7 +129,9 @@ func splitKey(key string) []string {
 func main() {
 	jsonData := []byte(`{
 		"credit_score": {"fcr": 10},
-		"profile": {"name": "member name"}
+		"profile": {"name": "member name"},
+		"district": "Batua",
+		"city": "Bandung"
 	}`)
 
 	var data map[string]interface{}

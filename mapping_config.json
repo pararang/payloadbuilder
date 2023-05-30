@@ -2,9 +2,8 @@
     "funderA": {
       "full_name": "profile.name",
       "fcr": "credit_score.fcr",
-      "address": {
-        "district": "district"
-      }
+      "address.city": "city",
+      "address.district": "district"
     },
     "funderB": {
       "borrower.name": "profile.name",
