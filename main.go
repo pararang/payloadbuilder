@@ -83,9 +83,7 @@ func mapDataToFunderPayload(data map[string]interface{}, funder string) (map[str
 		}
 
 		
-		payload[key] = val
-
-		keys := strings.Split(key, ".")
+		keys := splitKey(key)
 		nestedMap := createNestedMap(keys, val)
 
 		// Merge the nested map into the payload
@@ -93,19 +91,6 @@ func mapDataToFunderPayload(data map[string]interface{}, funder string) (map[str
 	}
 
 	return payload, nil
-
-	// switch funder {
-	// case "funderA":
-	// 	funderAPayload := FunderAPayload{}
-	// 	err = mapstructure.Decode(payload, &funderAPayload)
-	// 	return funderAPayload, err
-	// case "funderB":
-	// 	funderBPayload := FunderBPayload{}
-	// 	err = mapstructure.Decode(payload, &funderBPayload)
-	// 	return funderBPayload, err
-	// default:
-	// 	return nil, fmt.Errorf("unsupported funder: %s", funder)
-	// }
 }
 func createNestedMap(keys []string, value interface{}) map[string]interface{} {
 	nestedMap := make(map[string]interface{})
@@ -139,13 +124,12 @@ func mergeMaps(dest map[string]interface{}, src map[string]interface{}) map[stri
 	return dest
 }
 
-
-
 func getNestedValue(data map[string]interface{}, key string) (interface{}, error) {
 	keys := splitKey(key)
 	current := data
 
-	for _, k := range keys {
+	for i:=0; i<len(keys); i++ {
+		k := keys[i]
 		value, found := current[k]
 		if !found {
 			return nil, fmt.Errorf("Key '%s' not found", key)
@@ -158,7 +142,7 @@ func getNestedValue(data map[string]interface{}, key string) (interface{}, error
 			return value, nil
 		}
 	}
-	return current, nil
+	return nil, nil
 }
 
 func splitKey(key string) []string {
