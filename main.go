@@ -24,7 +24,7 @@ type BorrowerData struct {
 	FCR  int    `json:"fcr"`
 }
 
-type configJSON map[string]string
+type configJSON map[string]interface{}
 
 type MappingConfig struct {
 	FunderA configJSON `json:"funderA"`
@@ -52,7 +52,7 @@ func mapDataToFunderPayload(data map[string]interface{}, funder string) (interfa
 		return nil, err
 	}
 
-	mappingRules := map[string]string{}
+	mappingRules := configJSON{}
 	switch funder {
 	case "funderA":
 		mappingRules = config.FunderA
