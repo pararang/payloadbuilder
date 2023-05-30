@@ -24,9 +24,11 @@ type BorrowerData struct {
 	FCR  int    `json:"fcr"`
 }
 
+type configJSON map[string]string
+
 type MappingConfig struct {
-	FunderA map[string]string `json:"funderA"`
-	FunderB map[string]string `json:"funderB"`
+	FunderA configJSON `json:"funderA"`
+	FunderB configJSON `json:"funderB"`
 }
 
 func loadMappingConfig(filePath string) (MappingConfig, error) {
