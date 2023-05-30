@@ -10,13 +10,8 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-type MappingConfig struct {
-	FunderA map[string]string `json:"funderA"`
-	FunderB map[string]string `json:"funderB"`
-}
-
 type FunderAPayload struct {
-	FullName string `json:"full_name"`
+	FullName string `json:"full_name" mapstructure:"full_name"`
 	FCR      int    `json:"fcr"`
 }
 
@@ -27,6 +22,11 @@ type FunderBPayload struct {
 type BorrowerData struct {
 	Name string `json:"name"`
 	FCR  int    `json:"fcr"`
+}
+
+type MappingConfig struct {
+	FunderA map[string]string `json:"funderA"`
+	FunderB map[string]string `json:"funderB"`
 }
 
 func loadMappingConfig(filePath string) (MappingConfig, error) {
@@ -62,9 +62,10 @@ func mapDataToFunderPayload(data map[string]interface{}, funder string) (interfa
 
 	payload := make(map[string]interface{})
 	for key, value := range mappingRules {
-		val, ok := getValueByJSONPath(data, value)
-		if !ok {
-			return nil, fmt.Errorf("mapping value not found for key: %s", key)
+		val, err := getNestedValue(data, value)
+		if err != nil {
+			log.Println("failed get value for ", key)
+			continue
 		}
 		payload[key] = val
 	}
@@ -83,26 +84,28 @@ func mapDataToFunderPayload(data map[string]interface{}, funder string) (interfa
 	}
 }
 
-func getValueByJSONPath(data map[string]interface{}, path string) (interface{}, bool) {
-	parts := strings.Split(path, ".")
-	for i, part := range parts {
-		value, ok := data[part]
-		if !ok {
-			return nil, false
+func getNestedValue(data map[string]interface{}, key string) (interface{}, error) {
+	keys := splitKey(key)
+	current := data
+
+	for _, k := range keys {
+		value, found := current[k]
+		if !found {
+			return nil, fmt.Errorf("Key '%s' not found", key)
 		}
 
-		if i == len(parts)-1 {
-			return value, true
+		// If the value is a nested map, continue traversing
+		if nestedMap, ok := value.(map[string]interface{}); ok {
+			current = nestedMap
+		} else {
+			return value, nil
 		}
-
-		childData, ok := value.(map[string]interface{})
-		if !ok {
-			return nil, false
-		}
-		data = childData
 	}
+	return current, nil
+}
 
-	return nil, false
+func splitKey(key string) []string {
+	return strings.Split(key, ".")
 }
 
 func main() {
