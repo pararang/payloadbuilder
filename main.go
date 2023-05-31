@@ -151,7 +151,7 @@ func main() {
 	}
 
 	funder := "A" // Change this based on the chosen funder
-	process := "approvald" // Change this based on the chosen funder
+	process := "approval" // Change this based on the chosen funder
 
 	payload, err := mapDataToFunderPayload(data, funder, process)
 	if err != nil {
@@ -164,4 +164,11 @@ func main() {
 	}
 
 	fmt.Println(string(jsonPayload))
+
+	funder = "B" // Change this based on the chosen funder
+
+	payload, err = mapDataToFunderPayload(data, funder, process)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
