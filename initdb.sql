@@ -25,3 +25,14 @@ VALUES('approval', 'register farmer to funder');
 
 ALTER TABLE public.actions ADD CONSTRAINT actions_unique_code UNIQUE (code);
 ALTER TABLE public.funders ADD CONSTRAINT funders_unique_code UNIQUE (code);
+
+CREATE TABLE public.funder_actions (
+	id serial NOT NULL,
+	funder_id integer NOT NULL,
+	action_id integer NOT NULL,
+	CONSTRAINT funder_actions_pk PRIMARY KEY (id),
+	CONSTRAINT funder_actions_fk_funder FOREIGN KEY (funder_id) REFERENCES public.funders(id),
+	CONSTRAINT funder_actions_fk_action FOREIGN KEY (action_id) REFERENCES public.actions(id)
+);
+
+
