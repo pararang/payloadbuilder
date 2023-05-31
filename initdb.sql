@@ -35,4 +35,8 @@ CREATE TABLE public.funder_actions (
 	CONSTRAINT funder_actions_fk_action FOREIGN KEY (action_id) REFERENCES public.actions(id)
 );
 
+INSERT INTO public.funder_actions
+(funder_id, action_id)
+VALUES(1, 1);
+
 
