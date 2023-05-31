@@ -6,23 +6,8 @@ import (
 	"io/ioutil"
 	"log"
 	"strings"
-
-	// _ "github.com/mitchellh/mapstructure"
 )
 
-type FunderAPayload struct {
-	FullName string `json:"full_name" mapstructure:"full_name"`
-	FCR      int    `json:"fcr"`
-}
-
-type FunderBPayload struct {
-	Borrower BorrowerData `json:"borrower"`
-}
-
-type BorrowerData struct {
-	Name string `json:"name"`
-	FCR  int    `json:"fcr"`
-}
 
 type configJSON map[string]string
 
@@ -81,7 +66,6 @@ func mapDataToFunderPayload(data map[string]interface{}, funder string) (map[str
 			log.Println("failed get value for ", key)
 			continue
 		}
-
 		
 		keys := splitKey(key)
 		nestedMap := createNestedMap(keys, val)
