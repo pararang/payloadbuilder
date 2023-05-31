@@ -1,13 +1,20 @@
-{
-    "funderA": {
+[
+  {
+    "funder": "A",
+    "process": "approval",
+    "mapping": {
       "full_name": "profile.name",
       "fcr": "credit_score.fcr",
       "address.city": "city",
       "address.district": "district"
-    },
-    "funderB": {
+    }
+  },
+  {
+    "funder": "B",
+    "process": "disbursement",
+    "mapping": {
       "borrower.name": "profile.name",
       "borrower.fcr": "credit_score.fcr"
     }
   }
-  
+]
