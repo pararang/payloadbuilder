@@ -8,16 +8,24 @@ import (
 	"strings"
 )
 
-
-type configJSON map[string]string
-
-type MappingConfig struct {
-	FunderA configJSON `json:"funderA"`
-	FunderB configJSON `json:"funderB"`
+type ConfigRules map[string]string
+type ConfigItem struct {
+	Funder  string      `json:"funder"`
+	Process string      `json:"process"`
+	Rules   ConfigRules `json:"rules"`
 }
 
-func loadMappingConfig(filePath string) (MappingConfig, error) {
-	var config MappingConfig
+func GetRules(config []ConfigItem, funder, process string) (ConfigRules, error) {
+	for _, item := range config {
+		if item.Funder == funder && item.Process == process {
+			return item.Rules, nil
+		}
+	}
+	return nil, fmt.Errorf("not found config funder=%s, process=%s", funder, process)
+}
+
+func loadMappingConfig(filePath string) ([]ConfigItem, error) {
+	var config []ConfigItem
 	data, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		return config, err
@@ -43,20 +51,15 @@ func iterateFields(data map[string]interface{}, prefix string) {
 	}
 }
 
-func mapDataToFunderPayload(data map[string]interface{}, funder string) (map[string]interface{}, error) {
+func mapDataToFunderPayload(data map[string]interface{}, funder, process string) (map[string]interface{}, error) {
 	config, err := loadMappingConfig("mapping_config.json")
 	if err != nil {
 		return nil, err
 	}
 
-	mappingRules := configJSON{}
-	switch funder {
-	case "funderA":
-		mappingRules = config.FunderA
-	case "funderB":
-		mappingRules = config.FunderB
-	default:
-		return nil, fmt.Errorf("unsupported funder: %s", funder)
+	mappingRules, err := GetRules(config, funder, process)
+	if err != nil {
+		return nil, fmt.Errorf("failed GetRules: %w", err)
 	}
 
 	payload := make(map[string]interface{})
@@ -66,7 +69,7 @@ func mapDataToFunderPayload(data map[string]interface{}, funder string) (map[str
 			log.Println("failed get value for ", key)
 			continue
 		}
-		
+
 		keys := splitKey(key)
 		nestedMap := createNestedMap(keys, val)
 
@@ -112,7 +115,7 @@ func getNestedValue(data map[string]interface{}, key string) (interface{}, error
 	keys := splitKey(key)
 	current := data
 
-	for i:=0; i<len(keys); i++ {
+	for i := 0; i < len(keys); i++ {
 		k := keys[i]
 		value, found := current[k]
 		if !found {
@@ -147,9 +150,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	funder := "funderA" // Change this based on the chosen funder
+	funder := "A" // Change this based on the chosen funder
+	process := "approvald" // Change this based on the chosen funder
 
-	payload, err := mapDataToFunderPayload(data, funder)
+	payload, err := mapDataToFunderPayload(data, funder, process)
 	if err != nil {
 		log.Fatal(err)
 	}
