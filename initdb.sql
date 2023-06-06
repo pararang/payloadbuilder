@@ -48,6 +48,3 @@ CREATE TABLE public.destination_fields (
 	CONSTRAINT destination_fields_fk_funder_action FOREIGN KEY (funder_action_id) REFERENCES public.funder_actions(id)
 );
 CREATE INDEX destination_fields_funder_action_id_idx ON public.destination_fields (funder_action_id);
-
-
-
