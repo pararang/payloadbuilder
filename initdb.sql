@@ -62,4 +62,16 @@ CREATE TABLE public.payload_maps (
 );
 CREATE INDEX payload_maps_funder_action_id_idx ON public.payload_maps (funder_action_id);
 
+CREATE TABLE public.source_fields (
+	id int NOT NULL,
+	"key" varchar NOT NULL,
+	data_type varchar NOT NULL,
+	data_source varchar NOT NULL,
+	CONSTRAINT source_fields_pk PRIMARY KEY (id)
+);
+CREATE INDEX source_fields_data_source_idx ON public.source_fields (data_source);
+
+ALTER TABLE public.payload_maps ADD CONSTRAINT payload_maps_fk_source_field FOREIGN KEY (source_field_id) REFERENCES public.source_fields(id);
+
+
 
